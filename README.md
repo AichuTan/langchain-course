@@ -37,3 +37,67 @@ Main components I used:
 ```python
 from langchain.agents import create_agent
 from langchain_core.messages import HumanMessage
+```
+
+## 3. OpenAI
+
+I used OpenAI's GPT-5 as the LLM and reasoning engine.
+
+```python
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model="gpt-5")
+```
+
+## 4. Tavily Search
+
+Tavily provides web search functionality that the agent can use as a tool.
+
+``` python
+from langchain_tavily import TavilySearch
+
+tools = [TavilySearch()]
+```
+
+## 5. Pydantic
+
+Pydantic is used to define the structure (schema) of the agent's response.
+``` python
+from pydantic import BaseModel, Field
+
+class Source(BaseModel):
+    url: str = Field(description="The url of the source")
+
+class AgentResponse(BaseModel):
+    answer: str
+    sources: List[Source]
+
+```
+### 6. Agent
+
+```python
+agent = create_agent(
+    model=llm,
+    tools=tools,
+    response_format=AgentResponse
+)
+
+```
+The general workflow is:
+```text
+User Question
+      ↓
+     Agent
+      ↓
+     LLM
+      ↓
+Decides whether to use a tool
+      ↓
+Tavily Search
+      ↓
+Search Results
+      ↓
+     LLM
+      ↓
+Structured Response
+```
